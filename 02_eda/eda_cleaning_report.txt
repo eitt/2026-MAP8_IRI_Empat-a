@@ -1,0 +1,4 @@
+Raw cases: 2322
+Cases after QC (AC2/AC3): 1322
+Cases after MD outliers removal: 1262
+Dropped as potentially random: 60
