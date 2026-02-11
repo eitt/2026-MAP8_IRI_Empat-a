@@ -23,22 +23,31 @@ This project implements the **MAP-8 (Modeling and Analysis Pipeline)** roadmap f
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Python 3.10+**: `pandas`, `numpy`, `semopy`, `factor_analyzer`, `scikit-learn`, `scipy`, `matplotlib`, `seaborn`.
+- **Python 3.10+**: `pandas`, `numpy`, `semopy`, `factor_analyzer`, `scikit-learn`, `scipy`, `matplotlib`, `seaborn`, `python-docx`.
 - **R 4.5+**: `QCA`, `admisc`, `jsonlite`, `rlang`.
 
-### Execution
-To run the entire pipeline from data cleaning to final reporting, execute the master script:
+### Execution Workflow
 
-```powershell
-python main.py
-```
+The project is designed to be run in two main steps:
+
+1. **Analysis Pipeline**: Run all statistical models (Data Prep, SEM, Clustering, QCA).
+   ```powershell
+   python main.py
+   ```
+   *Note: Ensure R is installed at `C:\Program Files\R\R-4.5.1\bin\R.exe` for the QCA step.*
+
+2. **Manuscript Generation**: Create the final Word report with tables and figures.
+   ```powershell
+   python scripts/generate_word_report.py
+   ```
 
 ## 🛠️ Pipeline Details
 
-1.  **Data Harmonization**: Unifies 2023 (0-4 scale) and 2024-2025 (1-5 scale) into a single standard 1-5 scale. Corrects specific reverse-coding inconsistencies in the 2025 data (`FS7`, `PD13`).
-2.  **Psychometric Analysis**: Performs CFA and Cronbach's Alpha reliability checks.
-3.  **Configurational Analysis (fsQCA)**: Identifies combinations of empathy dimensions (and demographics) that lead to high total empathy.
-4.  **Latent Profiling**: Uses Hierarchical Clustering (Ward's method) to discover natural empathy profiles within the population.
+1.  **Data Harmonization**: Unifies 2023-2025 datasets into a standard 1-5 scale.
+2.  **Psychometric Analysis**: Performs CFA and Reliability checks (Outputs: `03_sem/`).
+3.  **Configurational Analysis (fsQCA)**: Identifies pathways to high empathy (Outputs: `04_qca/`).
+4.  **Latent Profiling**: Discovers empathy profiles via Clustering (Outputs: `05_clustering/`).
+5.  **Reporting**: Generates an executive summary and a publication-ready Word manuscript (Outputs: `06_reports/`).
 
 ## 📝 Documentation
 Detailed methodology notes are located in `docs/MAP8_IRI_pipeline.md`.
