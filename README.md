@@ -43,9 +43,15 @@ The analysis is automated via a two-step process:
 3. **Interactive EDA Playground**: 
    Explore sensitivity, outlier thresholds, and live SEM fit.
    ```powershell
-   streamlit run scripts/eda_app.py
+   streamlit run streamlit_app.py
    ```
-   *Requires `streamlit` and `plotly`.*
+   
+## 🌐 Online Deployment
+To publish this dashboard so others can use it:
+1. Push this repository to **GitHub**.
+2. Sign in to [Streamlit Community Cloud](https://share.streamlit.io).
+3. Connect your repo and select `streamlit_app.py` as the entry point.
+4. Your playground will be live at a custom `*.streamlit.app` URL.
 
 ## 🛠️ Methodological Highlights
 
