@@ -1,0 +1,58 @@
+=== fsQCA Analysis Report: IRI Empathy ===
+Date: 2026-02-10 20:13:21.348201 
+Total Cases analyzed: 1303 
+
+--- Necessity Analysis ---
+No single necessary condition identified.
+
+--- Truth Table ---
+
+  OUT: output value
+    n: number of cases in configuration
+ incl: sufficiency inclusion score
+  PRI: proportional reduction in inconsistency
+
+     fs_f pt_f ec_f pd_f   OUT    n    incl  PRI  
+16    1    1    1    1      1     228  0.996 0.991
+12    1    0    1    1      1     134  0.979 0.926
+15    1    1    1    0      1     138  0.974 0.908
+14    1    1    0    1      1     33   0.974 0.845
+ 8    0    1    1    1      1     66   0.971 0.858
+11    1    0    1    0      1     30   0.939 0.539
+ 4    0    0    1    1      1     46   0.911 0.458
+13    1    1    0    0      1     54   0.906 0.442
+ 6    0    1    0    1      1     33   0.902 0.302
+ 7    0    1    1    0      1     81   0.883 0.379
+10    1    0    0    1      1     91   0.874 0.431
+ 3    0    0    1    0      1     23   0.841 0.083
+ 9    1    0    0    0      1     40   0.820 0.104
+ 5    0    1    0    0      0     81   0.749 0.037
+ 2    0    0    0    1      0     101  0.721 0.066
+ 1    0    0    0    0      0     124  0.593 0.007
+
+
+--- Complex Solution (No Remainders) ---
+
+M1: fs_f + ec_f + pt_f*pd_f -> iri_total_f
+
+              inclS   PRI   covS   covU  
+---------------------------------------- 
+1       fs_f  0.837  0.722  0.850  0.072 
+2       ec_f  0.857  0.751  0.868  0.058 
+3  pt_f*pd_f  0.939  0.869  0.615  0.009 
+---------------------------------------- 
+          M1  0.766  0.628  0.988 
+
+
+--- Parsimonious Solution (With Remainders) ---
+
+M1: fs_f + ec_f + pt_f*pd_f -> iri_total_f
+
+              inclS   PRI   covS   covU  
+---------------------------------------- 
+1       fs_f  0.837  0.722  0.850  0.072 
+2       ec_f  0.857  0.751  0.868  0.058 
+3  pt_f*pd_f  0.939  0.869  0.615  0.009 
+---------------------------------------- 
+          M1  0.766  0.628  0.988 
+

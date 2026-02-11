@@ -1,0 +1,11 @@
+Optimal number of clusters (max silhouette): 2
+Cluster sizes:
+cluster
+1    662
+2    641
+
+Cluster Centroids (Means):
+          FS_mean   PT_mean   EC_mean   PD_mean
+cluster                                        
+1        2.700043  3.345490  3.084592  2.359948
+2        3.545799  3.861154  3.867172  2.866280

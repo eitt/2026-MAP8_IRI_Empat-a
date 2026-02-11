@@ -1,0 +1,10 @@
+as.declared             Labelled vectors with declared missing values
+as.haven                Coerce to haven / labelled objects
+drop_undeclare          Drop information / undeclare labelled objects
+is.empty                Test the presence of empty (undeclared) missing
+                        values
+labels                  Get / Declare value labels
+measurement             Get / Set measurement levels for declared
+                        objects
+missing_range           Get / Declare missing values
+w_IQR                   Compute weighted summaries for declared objects

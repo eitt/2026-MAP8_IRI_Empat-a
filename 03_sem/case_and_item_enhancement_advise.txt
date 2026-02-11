@@ -1,0 +1,13 @@
+=== Case Selection Analysis (Impact of Attention Checks) ===
+
+Lenient (Allow 1 fail): N=2212, Avg Alpha=0.488 (FS:0.59, PT:0.48, EC:0.30, PD:0.57)
+Strict (0 fails): N=1322, Avg Alpha=0.528 (FS:0.62, PT:0.52, EC:0.37, PD:0.60)
+
+Multivariate Outliers (Mahalanobis D > 56.89): 62 cases identified.
+Suggestion: Consider dropping these 62 respondents to stabilize the CFA model.
+
+=== Item Selection Impact on CFA Model Fit ===
+Model 1 (Full): CFI=0.797, TLI=0.776, RMSEA=0.081
+Model 2 (Reduced): CFI=0.922, TLI=0.908, RMSEA=0.069
+
+Clean Subset KMO: 0.932, Bartlett p: 0.0000

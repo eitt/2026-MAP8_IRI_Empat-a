@@ -1,0 +1,80 @@
+=== Advanced Reliability and SEM Analysis (Updated Scales) ===
+
+Global KMO MSA: 0.886
+
+--- Scale: FS (Cronbach's Alpha: 0.701) ---
+Item  AlphaIfDeleted  ItemTotalCorr
+ FS1        0.691386       0.314340
+ FS5        0.620266       0.572833
+ FS7        0.751124       0.028158
+FS12        0.711493       0.222177
+FS16        0.623198       0.562839
+FS23        0.607116       0.630655
+FS26        0.625520       0.562713
+
+--- Scale: PT (Cronbach's Alpha: 0.693) ---
+Item  AlphaIfDeleted  ItemTotalCorr
+ PT3        0.692877       0.265325
+ PT8        0.642743       0.472813
+PT11        0.623182       0.534917
+PT15        0.721051       0.194606
+PT21        0.643163       0.465677
+PT25        0.637765       0.473885
+PT28        0.639937       0.467642
+
+--- Scale: EC (Cronbach's Alpha: 0.662) ---
+Item  AlphaIfDeleted  ItemTotalCorr
+ EC2        0.595866       0.472739
+ EC4        0.648732       0.291011
+ EC9        0.621430       0.390550
+EC14        0.634020       0.345085
+EC18        0.652712       0.272222
+EC20        0.627012       0.371612
+EC22        0.600862       0.450558
+
+--- Scale: PD (Cronbach's Alpha: 0.741) ---
+Item  AlphaIfDeleted  ItemTotalCorr
+ PD6        0.683373       0.560100
+PD10        0.708371       0.460635
+PD13        0.748733       0.282071
+PD17        0.675106       0.588856
+PD19        0.758237       0.211527
+PD24        0.673641       0.614950
+PD27        0.704599       0.490540
+
+
+=== CFA Model Fit ===
+
+       DoF  DoF Baseline         chi2  chi2 p-value  chi2 Baseline       CFI       GFI      AGFI       NFI       TLI     RMSEA         AIC         BIC    LogLik
+Value  344           378  3271.171904           0.0   10496.736252  0.710718  0.688363  0.657562  0.688363  0.682126  0.080842  118.979015  439.669339  2.510493
+
+=== Factor Loadings ===
+lval rval  Estimate   p-value
+ FS1   FS  1.000000         -
+ FS5   FS  1.605987       0.0
+ FS7   FS  0.021085  0.734498
+FS12   FS  0.437233       0.0
+FS16   FS  1.684378       0.0
+FS23   FS  1.732053       0.0
+FS26   FS  1.587788       0.0
+ PT3   PT  1.000000         -
+ PT8   PT  2.030279       0.0
+PT11   PT  2.671342       0.0
+PT15   PT  0.789640  0.000002
+PT21   PT  2.308518       0.0
+PT25   PT  2.324180       0.0
+PT28   PT  2.263285       0.0
+ EC2   EC  1.000000         -
+ EC4   EC  0.200695  0.000159
+ EC9   EC  0.886176       0.0
+EC14   EC  0.332811       0.0
+EC18   EC  0.183323  0.000248
+EC20   EC  1.323836       0.0
+EC22   EC  1.459609       0.0
+ PD6   PD  1.000000         -
+PD10   PD  0.901093       0.0
+PD13   PD  0.388985       0.0
+PD17   PD  1.124011       0.0
+PD19   PD  0.215061       0.0
+PD24   PD  0.920030       0.0
+PD27   PD  0.663908       0.0

@@ -1,0 +1,52 @@
+=== Preliminary EFA & Reliability Report ===
+Scale    Alpha      KMO  Bartlett_p
+   FS 0.616536 0.847910         0.0
+   PT 0.524918 0.841115         0.0
+   EC 0.372380 0.780074         0.0
+   PD 0.599485 0.858567         0.0
+
+=== Item Improvement Suggestions ===
+Scale FS: Dropping FS7_rev enhances Alpha from 0.617 to 0.696
+Scale FS: Dropping FS12_rev enhances Alpha from 0.617 to 0.728
+Scale PT: Dropping PT3_rev enhances Alpha from 0.525 to 0.673
+Scale PT: Dropping PT15_rev enhances Alpha from 0.525 to 0.647
+Scale EC: Dropping EC4_rev enhances Alpha from 0.372 to 0.445
+Scale EC: Dropping EC14_rev enhances Alpha from 0.372 to 0.482
+Scale EC: Dropping EC18_rev enhances Alpha from 0.372 to 0.427
+Scale PD: Dropping PD13_rev enhances Alpha from 0.599 to 0.732
+Scale PD: Dropping PD19_rev enhances Alpha from 0.599 to 0.697
+
+=== CFA Model Fit Indices ===
+       DoF  DoF Baseline         chi2  chi2 p-value  chi2 Baseline       CFI       GFI      AGFI       NFI       TLI     RMSEA         AIC        BIC    LogLik
+Value  344           378  3314.976524           0.0   14979.857293  0.796534  0.778704  0.756832  0.778704  0.776424  0.080857  118.984907  440.57277  2.507547
+
+=== CFA Parameter Estimates (Loadings) ===
+    lval op rval  Estimate  Std. Err    z-value p-value
+     FS1  ~   FS  1.000000         -          -       -
+     FS5  ~   FS  1.333285  0.068994  19.324759     0.0
+ FS7_rev  ~   FS -0.321070  0.047019  -6.828511     0.0
+FS12_rev  ~   FS -0.509116   0.04901 -10.387936     0.0
+    FS16  ~   FS  1.363725  0.069657  19.577849     0.0
+    FS23  ~   FS  1.390271  0.067609  20.563357     0.0
+    FS26  ~   FS  1.271162  0.065197  19.497219     0.0
+ PT3_rev  ~   PT  1.000000         -          -       -
+     PT8  ~   PT -1.595373  0.127897  -12.47385     0.0
+    PT11  ~   PT -2.107066   0.16168 -13.032327     0.0
+PT15_rev  ~   PT  0.633007  0.096148   6.583654     0.0
+    PT21  ~   PT -1.951509  0.151549 -12.877111     0.0
+    PT25  ~   PT -1.894154  0.152984 -12.381421     0.0
+    PT28  ~   PT -1.822124  0.147345 -12.366343     0.0
+     EC2  ~   EC  1.000000         -          -       -
+ EC4_rev  ~   EC -0.414463  0.039878 -10.393188     0.0
+     EC9  ~   EC  0.981159  0.045275  21.671083     0.0
+EC14_rev  ~   EC -0.498573  0.039778 -12.533832     0.0
+EC18_rev  ~   EC -0.326238  0.036083  -9.041272     0.0
+    EC20  ~   EC  1.126549  0.050144  22.466278     0.0
+    EC22  ~   EC  1.209139    0.0525  23.031284     0.0
+     PD6  ~   PD  1.000000         -          -       -
+    PD10  ~   PD  0.981011    0.0388  25.283894     0.0
+PD13_rev  ~   PD -0.472220  0.035103   -13.4523     0.0
+    PD17  ~   PD  1.074289  0.039448  27.233275     0.0
+PD19_rev  ~   PD -0.321295  0.030898 -10.398555     0.0
+    PD24  ~   PD  0.897625  0.033868  26.503741     0.0
+    PD27  ~   PD  0.736619  0.030763  23.944937     0.0

@@ -1,0 +1,31 @@
+CVR                     Ethnic protest in Europe
+HC                      Time-Difference
+LR                      Lipset's indicators for the survival of
+                        democracy during the inter-war period.
+NF                      Class voting in post-World War era
+QCA-package             QCA: A Package for Qualitative Comparative
+                        Analysis
+RS                      University recognition of a graduate student
+                        union
+XYplot                  Create an XY plot
+Xplot                   Display the distribution of points for a single
+                        condition
+_Legacy datasets        Legacy datasets
+allExpressions          Functions Related to the Implicant Matrix
+calibrate               Calibrate raw data to crisp or fuzzy sets
+causalChain             Perform CNA - coincidence analysis using QCA
+complexity              Number of combinations at a given complexity
+                        layer
+findRows                Find untenable configurations
+findTh                  Find calibration thresholds
+fuzzyand                Logical operations
+generate                Generate a custom data structure
+makeChart               Create and solve a prime implicants chart
+minimize                Minimize a truth table
+modelFit                Theory evaluation
+pof                     Calculate parameters of fit
+retention               Compute the retention probability of a csQCA
+                        solution
+runGUI                  run the GUI shiny app for the QCA package
+superSubset             Functions to find subsets or supersets
+truthTable              Create a truth table
