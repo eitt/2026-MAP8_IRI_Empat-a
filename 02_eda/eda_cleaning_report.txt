@@ -1,4 +1,28 @@
-Raw cases: 2322
-Cases after QC (AC2/AC3): 1322
-Cases after MD outliers removal: 1262
-Dropped as potentially random: 60
+=== MAP-8 EDA & Cleaning Report ===
+Note: 2025 dataset excluded per user request.
+
+Raw cases total: 2081
+Raw cases by year:
+year
+2023    1110
+2024     971
+
+Cases after Quality Control (AC2/AC3 filtering): 1138
+Cases after Outlier Removal (Mahalanobis Distance): 1083
+Dropped as potentially random: 55
+
+Final Cleaned Sample by year:
+year
+2023    1062
+2024      21
+
+=== Descriptive Statistics (Cleaned Sample) ===
+           FS_mean      PT_mean      EC_mean      PD_mean    IRI_total
+count  1083.000000  1083.000000  1083.000000  1083.000000  1083.000000
+mean      3.100778     3.607176     3.460889     2.558502     3.181836
+std       0.706600     0.621080     0.622542     0.659950     0.438926
+min       1.428571     1.428571     1.285714     1.000000     1.821429
+25%       2.571429     3.142857     3.000000     2.142857     2.892857
+50%       3.000000     3.571429     3.428571     2.571429     3.142857
+75%       3.571429     4.000000     3.857143     3.000000     3.464286
+max       5.000000     5.000000     5.000000     4.428571     4.500000

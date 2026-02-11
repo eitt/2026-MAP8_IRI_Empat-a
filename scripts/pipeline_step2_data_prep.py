@@ -7,14 +7,12 @@ from scipy.stats import chi2
 os.makedirs('01_harmonized', exist_ok=True)
 os.makedirs('02_eda', exist_ok=True)
 
-# 1. Load Raw Data
+# 1. Load Raw Data (Excluding 2025 as per user request)
 df23_raw = pd.read_excel('00_raw/1_2023_data_IRI.xlsx')
 df24_raw = pd.read_excel('00_raw/2_2024_data_IRI.xlsx')
-df25_raw = pd.read_excel('00_raw/3_2025_data_IRI.xlsx')
 
 df23_raw['year'] = 2023
 df24_raw['year'] = 2024
-df25_raw['year'] = 2025
 
 # Item indices
 fs_idx = [1, 5, 7, 12, 16, 23, 26]
@@ -43,14 +41,7 @@ df24 = df24_raw.copy()
 mapping24 = {f"E{get_canonical(i)}": get_canonical(i) for i in range(1, 29)}
 df24 = df24.rename(columns=mapping24)
 
-# 2025: 1-5, reverse FS7 and PD13 ONLY
-df25 = df25_raw.copy()
-mapping25 = {f"iri_{get_canonical(i)}": get_canonical(i) for i in range(1, 29)}
-df25 = df25.rename(columns=mapping25)
-df25['FS7'] = 6 - df25['FS7']
-df25['PD13'] = 6 - df25['PD13']
-
-# 3. Concatenate
+# 3. Concatenate (Excluding 2025)
 def get_h(df, year):
     map_cols = {
         'ID': 'respondent_id', 'iri_id': 'respondent_id',
@@ -67,7 +58,7 @@ def get_h(df, year):
         if c not in df_h.columns: df_h[c] = np.nan
     return df_h[cols]
 
-df_all = pd.concat([get_h(df23, 2023), get_h(df24, 2024), get_h(df25, 2025)], ignore_index=True)
+df_all = pd.concat([get_h(df23, 2023), get_h(df24, 2024)], ignore_index=True)
 
 # 4. Computed Scores
 df_all['FS_mean'] = df_all[[f"FS{i}" for i in fs_idx]].mean(axis=1)
@@ -89,7 +80,7 @@ def calc_qc(row):
 df_all['qc_fail_count'] = df_all.apply(calc_qc, axis=1)
 df_clean = df_all[df_all['qc_fail_count'] == 0].copy()
 
-# Multivariate Outliers (Random Answers Check)
+# Multivariate Outliers (Random Answers Check) using Mahalanobis Distance
 def get_md(df_items):
     data = df_items.dropna()
     mu = data.mean()
@@ -102,7 +93,7 @@ def get_md(df_items):
 # Use only items for MD
 md_items = [c for c in all_items if c in df_clean.columns]
 md_scores = get_md(df_clean[md_items])
-# Threshold: Chi2 df=28, p < 0.001 (approx MD > 7.5 or D2 > 56)
+# Threshold: Chi2 df=28, p < 0.001
 threshold = np.sqrt(chi2.ppf(1 - 0.001, df=len(md_items)))
 df_clean['md_score'] = md_scores
 df_clean['is_outlier'] = df_clean['md_score'] > threshold
@@ -111,12 +102,26 @@ df_final = df_clean[df_clean['is_outlier'] == False].drop(columns=['md_score', '
 # 6. Save
 df_all.to_csv('01_harmonized/df_iri_all_harmonized.csv', index=False)
 df_final.to_csv('01_harmonized/df_iri_clean.csv', index=False)
+# Save Descriptive Stats for Word Report
+subscales = ['FS_mean', 'PT_mean', 'EC_mean', 'PD_mean', 'IRI_total']
+df_final[subscales].describe().to_csv('02_eda/descriptive_stats.csv')
 
-# EDA Summary
+# 7. EDA Summary Report
+subscales = ['FS_mean', 'PT_mean', 'EC_mean', 'PD_mean', 'IRI_total']
+desc_stats = df_final[subscales].describe().to_string()
+counts_by_year = df_all['year'].value_counts().to_string()
+clean_counts_by_year = df_final['year'].value_counts().to_string()
+
 with open('02_eda/eda_cleaning_report.txt', 'w') as f:
-    f.write(f"Raw cases: {len(df_all)}\n")
-    f.write(f"Cases after QC (AC2/AC3): {len(df_clean)}\n")
-    f.write(f"Cases after MD outliers removal: {len(df_final)}\n")
-    f.write(f"Dropped as potentially random: {len(df_clean) - len(df_final)}\n")
+    f.write("=== MAP-8 EDA & Cleaning Report ===\n")
+    f.write(f"Note: 2025 dataset excluded per user request.\n\n")
+    f.write(f"Raw cases total: {len(df_all)}\n")
+    f.write(f"Raw cases by year:\n{counts_by_year}\n\n")
+    f.write(f"Cases after Quality Control (AC2/AC3 filtering): {len(df_clean)}\n")
+    f.write(f"Cases after Outlier Removal (Mahalanobis Distance): {len(df_final)}\n")
+    f.write(f"Dropped as potentially random: {len(df_clean) - len(df_final)}\n\n")
+    f.write(f"Final Cleaned Sample by year:\n{clean_counts_by_year}\n\n")
+    f.write("=== Descriptive Statistics (Cleaned Sample) ===\n")
+    f.write(desc_stats)
 
-print(f"Data Prep Complete. Clean N = {len(df_final)}")
+print(f"Data Prep Complete (2023-2024 only). Clean N = {len(df_final)}")

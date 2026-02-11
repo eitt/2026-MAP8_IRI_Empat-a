@@ -1,13 +1,13 @@
 # MAP-8 Implementation Guide for Empathy Research Using the IRI (Spanish versions)
 
-This document operationalizes the **MAP-8 (Modeling and Analysis Pipeline)** roadmap for an empathy project using the **Interpersonal Reactivity Index (IRI)** across three datasets (2023, 2024, 2025). It is designed to be used as a practical *analysis playbook* with explicit preprocessing, EDA, harmonization, and method-specific pipelines (CB-SEM, fsQCA, and Hierarchical Clustering).
+This document operationalizes the **MAP-8 (Modeling and Analysis Pipeline)** roadmap for an empathy project using the **Interpersonal Reactivity Index (IRI)** across two datasets (2023, 2024). It is designed to be used as a practical *analysis playbook* with explicit preprocessing, EDA, harmonization, and method-specific pipelines (CB-SEM, fsQCA, and Hierarchical Clustering). Note: 2025 is currently excluded.
 
 **Primary inputs**
 - MAP-8 methodology source: *2. Draft.docx* fileciteturn1file12  
 - IRI datasets:
   - *1_2023_data_IRI.xlsx*
   - *2_2024_data_IRI.xlsx*
-  - *3_2025_data_IRI.xlsx*
+  - (3_2025_data_IRI.xlsx is excluded)
 
 ---
 

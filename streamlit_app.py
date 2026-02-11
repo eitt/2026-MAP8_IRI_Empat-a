@@ -1,3 +1,12 @@
+import sys
+import subprocess
+
+if __name__ == "__main__" and "streamlit" not in sys.modules:
+    print("\n[!] ERROR: You are trying to run this file with 'python'.")
+    print("Please use the following command instead:")
+    print("    python -m streamlit run streamlit_app.py\n")
+    sys.exit(1)
+
 import streamlit as st
 import pandas as pd
 import numpy as np

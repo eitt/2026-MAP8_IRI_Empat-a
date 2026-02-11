@@ -1,6 +1,6 @@
 # MAP-8 IRI Empathy Research Project
 
-This project implements the **MAP-8 (Modeling and Analysis Pipeline)** roadmap for analyzing empathy dimensions using the Interpersonal Reactivity Index (IRI) across three cohort datasets (2023, 2024, 2025).
+This project implements the **MAP-8 (Modeling and Analysis Pipeline)** roadmap for analyzing empathy dimensions using the Interpersonal Reactivity Index (IRI) across two cohort datasets (2023, 2024). Note: The 2025 dataset is currently excluded from the core pipeline as per research requirements.
 
 ## 📁 Project Structure
 
@@ -26,9 +26,14 @@ This project implements the **MAP-8 (Modeling and Analysis Pipeline)** roadmap f
 - **Python 3.12+**: `pandas`, `numpy`, `semopy`, `factor_analyzer`, `scikit-learn`, `scipy`, `matplotlib`, `seaborn`, `python-docx`, `openpyxl`.
 - **R 4.5.1+**: `QCA`, `admisc` (The pipeline automatically handles dependency resolution in R).
 
-### Execution Workflow
+### One-Click Reproduction
+To execute the entire pipeline from scratch (installing packages, cleaning data, running SEM/QCA, and generating the Word report):
+```powershell
+python run_full_reproduction.py
+```
 
-The analysis is automated via a two-step process:
+### Granular Execution Workflow
+If you prefer to run steps individually:
 
 1. **Run the Analysis Pipeline**:
    This performs data harmonization, multivariate outlier detection (Mahalanobis Distance), SEM/CFA, Clustering, and fsQCA.
@@ -40,10 +45,12 @@ The analysis is automated via a two-step process:
 2. **Generate the Manuscript**:
    This harvests all tables and figures into a formatted Word document.
    ```powershell
+   python scripts/generate_word_report.py
+   ```
 3. **Interactive EDA Playground**: 
    Explore sensitivity, outlier thresholds, and live SEM fit.
    ```powershell
-   streamlit run streamlit_app.py
+   python -m streamlit run streamlit_app.py
    ```
    
 ## 🌐 Online Deployment

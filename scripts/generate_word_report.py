@@ -59,9 +59,8 @@ def create_report():
             final_n = re.search(r"Cases after MD.*: (\d+)", content).group(1) if re.search(r"Cases after MD.*: (\d+)", content) else final_n
             dropped_n = re.search(r"Dropped as potentially random: (\d+)", content).group(1) if re.search(r"Dropped as potentially random: (\d+)", content) else dropped_n
 
-    doc.add_paragraph(f"The initial dataset consisted of {raw_n} raw cases collected via an online survey across three cohorts (2023-2025). "
+    doc.add_paragraph(f"The initial dataset consisted of {raw_n} raw cases collected via an online survey across two cohorts (2023-2024). "
                    "In Step 2, data was unified into a common 1-5 Likert scale (converting 2023's 0-4 scale via +1 transformation). "
-                   "Reverse-coding was applied only to items identified as inconsistent in raw files (FS7, PD13). "
                    "Data quality was ensured through a multi-stage filtering process aligned with MAP-8 principles:")
     
     p = doc.add_paragraph(style='List Bullet')
@@ -72,8 +71,40 @@ def create_report():
     p.add_run(f"An additional {dropped_n} cases were flagged as potentially random response patterns and removed.")
     
     doc.add_paragraph("Detection of potentially random answers: High Mahalanobis distance (MD) indicates a combination of answers (multivariate outlier) "
-                   "that is statistically improbable given the population distribution. Specifically, we used a \u03C7\u00B2 threshold with 28 degrees of freedom (p < 0.001) "
+                   "that is statistically improbable given the population distribution. The Mahalanobis distance is calculated using the following equation:")
+    
+    # Equation for Mahalanobis Distance
+    p_eq = doc.add_paragraph()
+    p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run_eq = p_eq.add_run("D\u00B2(x) = (x - \u03BC)\u1D40 S\u207B\u00B9 (x - \u03BC)")
+    run_eq.bold = True
+    run_eq.font.size = Pt(12)
+    
+    doc.add_paragraph("Where x represents the vector of item responses for an individual, \u03BC is the vector of means, and S\u207B\u00B9 is the inverse of the covariance matrix. "
+                   "Specifically, we used a \u03C7\u00B2 threshold with 28 degrees of freedom (p < 0.001) "
                    "to isolate and remove these inconsistent profiles, ensuring the subsequent SEM and QCA models are not biased by noise.")
+
+    # Descriptive Statistics Table
+    desc_path = '02_eda/descriptive_stats.csv'
+    if os.path.exists(desc_path):
+        doc.add_heading("Table 1. Descriptive Statistics (Cleaned Sample)", level=2)
+        df_desc = pd.read_csv(desc_path, index_col=0)
+        table = doc.add_table(rows=df_desc.shape[0]+1, cols=df_desc.shape[1]+1)
+        table.style = 'Table Grid'
+        
+        # Header
+        table.cell(0, 0).text = "Statistic"
+        for j, col in enumerate(df_desc.columns):
+            table.cell(0, j+1).text = str(col)
+            set_table_header_bg(table.cell(0, j+1))
+        set_table_header_bg(table.cell(0, 0))
+        
+        # Rows
+        for i, (idx, row) in enumerate(df_desc.iterrows()):
+            table.cell(i+1, 0).text = str(idx)
+            for j, val in enumerate(row):
+                table.cell(i+1, j+1).text = f"{val:.3f}"
+        add_spacer(doc)
 
     # Factorability stats
     sem_report_path = '03_sem/advanced_sem_detailed_report.txt'
@@ -90,8 +121,8 @@ def create_report():
     p = doc.add_paragraph(style='List Bullet')
     p.add_run(f"Bartlett’s test of sphericity was highly significant (p {bartlett_p}), confirming variables are sufficiently correlated for factor analysis.")
 
-    # Table 1 Reliability
-    doc.add_heading("Table 1. Reliability Metrics (Cronbach's Alpha) per Subscale", level=2)
+    # Table 2 Reliability
+    doc.add_heading("Table 2. Reliability Metrics (Cronbach's Alpha) per Subscale", level=2)
     rel_path = '03_sem/reliability_stats.csv'
     if os.path.exists(rel_path):
         df_rel = pd.read_csv(rel_path)
@@ -132,7 +163,7 @@ def create_report():
     # Load CFA table
     cfa_path = '03_sem/cfa_estimates.csv'
     if os.path.exists(cfa_path):
-        doc.add_heading("Table 2. Standardized Factor Loadings", level=2)
+        doc.add_heading("Table 3. Standardized Factor Loadings", level=2)
         df_cfa = pd.read_csv(cfa_path)
         loadings = df_cfa[df_cfa['op'] == '~']
         table = doc.add_table(rows=1, cols=4)
@@ -160,7 +191,7 @@ def create_report():
     if os.path.exists(qca_report_path):
         with open(qca_report_path, 'r') as f:
             qca_text = f.read()
-            doc.add_heading("Table 3. Parsimonious Solution for High Total Empathy", level=2)
+            doc.add_heading("Table 4. Parsimonious Solution for High Total Empathy", level=2)
             if "--- Parsimonious Solution" in qca_text:
                 sol_part = qca_text.split("--- Parsimonious Solution")[1].strip()
                 p = doc.add_paragraph()
@@ -175,7 +206,7 @@ def create_report():
     cluster_profiles_path = '05_clustering/cluster_profiles.csv'
     if os.path.exists(cluster_profiles_path):
         df_p = pd.read_csv(cluster_profiles_path, index_col=0)
-        doc.add_heading("Table 4. Mean Scores by Cluster (IRI profiles)", level=2)
+        doc.add_heading("Table 5. Mean Scores by Cluster (IRI profiles)", level=2)
         table = doc.add_table(rows=df_p.shape[0]+1, cols=df_p.shape[1]+1)
         table.style = 'Table Grid'
         table.cell(0,0).text = "Cluster"

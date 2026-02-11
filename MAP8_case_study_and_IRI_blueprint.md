@@ -3,7 +3,7 @@
 This document has two purposes:
 
 1. **Describe the MAP-8 case study implemented in _2. Draft.docx_** (telework dataset), including the constructs, hypotheses, and the concrete outputs (graphs/tables) used across the **eight MAP-8 steps**.
-2. **Provide a step-by-step blueprint to reproduce an analogous MAP-8 case study using the IRI datasets (2023–2025)**, emphasizing **methodological complementariedad** (CB-SEM + fsQCA + Hierarchical Clustering).
+2. **Provide a step-by-step blueprint to reproduce an analogous MAP-8 case study using the IRI datasets (2023–2024)**, emphasizing **methodological complementariedad** (CB-SEM + fsQCA + Hierarchical Clustering). Note: 2025 is excluded.
 
 Source: *2. Draft.docx* fileciteturn1file12
 
