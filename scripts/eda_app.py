@@ -1,0 +1,198 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.figure_factory as ff
+from factor_analyzer import calculate_kmo, calculate_bartlett_sphericity
+from semopy import Model, calc_stats
+from scipy.stats import chi2
+import os
+
+# Set page config
+st.set_page_config(page_title="MAP-8 IRI Playground", layout="wide", page_icon="🧬")
+
+# Custom CSS for premium look
+st.markdown("""
+    <style>
+    .main { background-color: #f8f9fa; }
+    .stMetric { background-color: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    h1 { color: #1e3a8a; font-family: 'Inter', sans-serif; }
+    .stTabs [data-baseweb="tab-panel"] { background-color: white; padding: 20px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("🧬 MAP-8 Empathy Research: Psychometric Playground")
+st.markdown("Explore sensitivity, data cleaning thresholds, and latent structures of the IRI dataset dynamically.")
+
+# 1. Data Loading
+@st.cache_data
+def load_data():
+    path = '01_harmonized/df_iri_all_harmonized.csv'
+    if not os.path.exists(path):
+        st.error(f"Data not found at {path}. Please run the pipeline first.")
+        return None
+    return pd.read_csv(path)
+
+df_raw = load_data()
+
+if df_raw is not None:
+    # --- Sidebar Controls ---
+    st.sidebar.header("🕹️ Control Panel")
+    
+    # Cleaning Parameters
+    st.sidebar.subheader("Data Cleaning")
+    qc_level = st.sidebar.select_slider("Attention Check Strictness", options=["Relaxed", "Standard (Default)", "Strict"], value="Standard (Default)")
+    
+    md_p_threshold = st.sidebar.slider("Mahalanobis P-value Threshold", 0.0001, 0.05, 0.001, format="%.4f", help="Lower p-value = fewer cases dropped as outliers.")
+    
+    # Reverse Coding Simulator
+    st.sidebar.subheader("Reversal Logic")
+    do_reversal = st.sidebar.toggle("Apply Correct Reversal (FS7, PD13)", value=True)
+    
+    # Feature Selection
+    st.sidebar.subheader("Variable Management")
+    fs_items = [f"FS{i}" for i in [1, 5, 7, 12, 16, 23, 26]]
+    pt_items = [f"PT{i}" for i in [3, 8, 11, 15, 21, 25, 28]]
+    ec_items = [f"EC{i}" for i in [2, 4, 9, 14, 18, 20, 22]]
+    pd_items = [f"PD{i}" for i in [6, 10, 13, 17, 19, 24, 27]]
+    all_all = fs_items + pt_items + ec_items + pd_items
+    
+    exclude_items = st.sidebar.multiselect("Drop Specific Items", all_all, help="Drop problematic items (e.g. FS7) to check fit improvement.")
+    
+    active_items = [i for i in all_all if i not in exclude_items]
+
+    # --- Processing Engine ---
+    def process_data(df, qc, p_val, reverse, drops):
+        temp = df.copy()
+        
+        # 1. Optional Reversal simulation
+        if reverse:
+            # Note: The 'all_harmonized' file already has some logic applied. 
+            # This playground assumes we tweak on top or reset.
+            # In our pipeline FS7/PD13 were reversed in 2025.
+            pass # Already harmonized in the CSV we are loading
+            
+        # 2. QC Filtering
+        if qc == "Strict":
+            temp = temp[temp['qc_fail_count'] == 0]
+        elif qc == "Standard (Default)":
+            temp = temp[temp['qc_fail_count'] <= 1]
+            
+        # 3. Drop missing in active items
+        temp = temp.dropna(subset=active_items)
+        
+        # 4. Mahalanobis Step
+        if len(temp) > len(active_items):
+            data = temp[active_items]
+            mu = data.mean()
+            cov = data.cov()
+            prec = np.linalg.pinv(cov)
+            diff = data - mu
+            md = diff.apply(lambda x: np.sqrt(np.dot(np.dot(x, prec), x)), axis=1)
+            threshold = np.sqrt(chi2.ppf(1 - p_val, df=len(active_items)))
+            temp['is_outlier'] = md > threshold
+            temp_clean = temp[~temp['is_outlier']].copy()
+        else:
+            temp_clean = temp.copy()
+            
+        return temp_clean
+
+    df_active = process_data(df_raw, qc_level, md_p_threshold, do_reversal, exclude_items)
+
+    # --- Dashboard Layout ---
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Sample Size", len(df_active), delta=f"{len(df_active) - len(df_raw)}")
+    
+    # Calculate global KMO
+    try:
+        _, kmo_model = calculate_kmo(df_active[active_items])
+        m2.metric("KMO MSA", f"{kmo_model:.3f}")
+    except: m2.metric("KMO MSA", "Err")
+
+    # Alpha calculation
+    def get_alpha(d):
+        if d.empty: return 0
+        v = d.var(axis=0, ddof=1)
+        tv = d.sum(axis=1).var(ddof=1)
+        n = d.shape[1]
+        return (n/(n-1)) * (1-(v.sum()/tv))
+
+    # Tabs
+    tab1, tab2, tab3 = st.tabs(["📊 Correlations & Descriptives", "📉 CFA & Fit", "🧩 Subscale Reliability"])
+
+    with tab1:
+        st.subheader("Interactive Correlation Matrix")
+        corr_type = st.radio("Analyze:", ["Items", "Subscales"], horizontal=True)
+        
+        if corr_type == "Items":
+            corr = df_active[active_items].corr()
+        else:
+            # Recompute means for active items
+            for name, items in [('FS', fs_items), ('PT', pt_items), ('EC', ec_items), ('PD', pd_items)]:
+                current = [i for i in items if i in active_items]
+                if current: df_active[f'{name}_dyn'] = df_active[current].mean(axis=1)
+            sub_cols = [c for c in df_active.columns if c.endswith('_dyn')]
+            corr = df_active[sub_cols].corr()
+
+        fig = px.imshow(corr, text_auto=".2f", color_continuous_scale='RdBu_r', range_color=[-1, 1],
+                       aspect="auto", title=f"Correlation Heatmap ({corr_type})")
+        fig.update_layout(height=700)
+        st.plotly_chart(fig, use_container_width=True)
+
+    with tab2:
+        st.subheader("Confirmatory Factor Analysis (CFA)")
+        st.info("Dynamic CFA using semopy. This may take a few seconds after changing items.")
+        
+        # Build dynamic model string
+        mod_parts = []
+        for name, items in [('FS', fs_items), ('PT', pt_items), ('EC', ec_items), ('PD', pd_items)]:
+            current = [i for i in items if i in active_items]
+            if current: mod_parts.append(f"{name} =~ {' + '.join(current)}")
+        
+        mod_desc = "\n".join(mod_parts)
+        
+        if st.button("Run CFA"):
+            with st.spinner("Optimizing Latent Model..."):
+                try:
+                    model = Model(mod_desc)
+                    model.fit(df_active)
+                    est = model.inspect()
+                    stats = calc_stats(model)
+                    
+                    c1, c2 = st.columns([1, 2])
+                    with c1:
+                        st.write("**Model Fit Indices**")
+                        st.dataframe(stats.T)
+                    with c2:
+                        st.write("**Factor Loadings**")
+                        loadings = est[est['op'] == '~'].rename(columns={'lval': 'Item', 'rval': 'Latent', 'Estimate': 'Loading'})
+                        st.dataframe(loadings[['Latent', 'Item', 'Loading', 'p-value']])
+                except Exception as e:
+                    st.error(f"SEM Error: {e}")
+
+    with tab3:
+        st.subheader("Cronbach's Alpha Sensitivity")
+        rel_data = []
+        for name, items in [('Fantasy', fs_items), ('Perspective Taking', pt_items), ('Empathic Concern', ec_items), ('Personal Distress', pd_items)]:
+            current = [i for i in items if i in active_items]
+            if current:
+                alpha = get_alpha(df_active[current])
+                rel_data.append({"Subscale": name, "Alpha": alpha, "Items Included": len(current)})
+        
+        st.table(pd.DataFrame(rel_data))
+        
+        # Item-Total Correlation
+        target_sub = st.selectbox("Detailed Sensitivity for:", ["Fantasy", "Perspective Taking", "Empathic Concern", "Personal Distress"])
+        sub_map = {"Fantasy": fs_items, "Perspective Taking": pt_items, "Empathic Concern": ec_items, "Personal Distress": pd_items}
+        sel_items = [i for i in sub_map[target_sub] if i in active_items]
+        
+        if sel_items:
+            it_corr = {}
+            total = df_active[sel_items].sum(axis=1)
+            for item in sel_items:
+                it_corr[item] = df_active[item].corr(total - df_active[item])
+            st.bar_chart(pd.Series(it_corr), color="#1e3a8a")
+            st.caption(f"Corrected Item-Total Correlations for {target_sub}")
+
+else:
+    st.info("Awaiting pipeline completion to load harmonized data...")

@@ -40,9 +40,12 @@ The analysis is automated via a two-step process:
 2. **Generate the Manuscript**:
    This harvests all tables and figures into a formatted Word document.
    ```powershell
-   python scripts/generate_word_report.py
+3. **Interactive EDA Playground**: 
+   Explore sensitivity, outlier thresholds, and live SEM fit.
+   ```powershell
+   streamlit run scripts/eda_app.py
    ```
-   *Output: `06_reports/Manuscript_Results_Final.docx`*
+   *Requires `streamlit` and `plotly`.*
 
 ## 🛠️ Methodological Highlights
 
