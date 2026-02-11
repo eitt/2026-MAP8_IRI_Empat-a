@@ -3,33 +3,12 @@ Date: 2026-02-10
 
 ## 1. Data Preparation and EDA
 === MAP-8 EDA & Cleaning Report ===
-Note: 2025 dataset excluded per user request.
-
 Raw cases total: 2081
-Raw cases by year:
-year
-2023    1110
-2024     971
-
 Cases after Quality Control (AC2/AC3 filtering): 1138
-Cases after Outlier Removal (Mahalanobis Distance): 1083
+Final cases after Outlier Removal (Mahalanobis Distance): 1083
+Dropped as inattentive: 943
 Dropped as potentially random: 55
 
-Final Cleaned Sample by year:
-year
-2023    1062
-2024      21
-
-=== Descriptive Statistics (Cleaned Sample) ===
-           FS_mean      PT_mean      EC_mean      PD_mean    IRI_total
-count  1083.000000  1083.000000  1083.000000  1083.000000  1083.000000
-mean      3.100778     3.607176     3.460889     2.558502     3.181836
-std       0.706600     0.621080     0.622542     0.659950     0.438926
-min       1.428571     1.428571     1.285714     1.000000     1.821429
-25%       2.571429     3.142857     3.000000     2.142857     2.892857
-50%       3.000000     3.571429     3.428571     2.571429     3.142857
-75%       3.571429     4.000000     3.857143     3.000000     3.464286
-max       5.000000     5.000000     5.000000     4.428571     4.500000
 
 ## 2. Measurement Reliability (Step 4A)
 Global KMO MSA: 0.888
@@ -45,37 +24,6 @@ PD: Alpha = 0.756
        DoF  DoF Baseline         chi2  chi2 p-value  chi2 Baseline       CFI       GFI      AGFI       NFI       TLI     RMSEA         AIC         BIC    LogLik
 Value  344           378  3085.171752           0.0    9444.774337  0.697668  0.673346  0.641061  0.673346  0.667787  0.085817  118.302545  427.526941  2.848727
 
-=== Factor Loadings ===
-    lval op rval  Estimate  Std. Err    z-value   p-value
-0    FS1  ~   FS  1.000000         -          -         -
-1    FS5  ~   FS  1.563764  0.119979  13.033673       0.0
-2    FS7  ~   FS  0.071578  0.067313   1.063354  0.287621
-3   FS12  ~   FS  0.407608  0.073151   5.572175       0.0
-4   FS16  ~   FS  1.705609   0.12676  13.455401       0.0
-5   FS23  ~   FS  1.688855  0.122113  13.830276       0.0
-6   FS26  ~   FS  1.629182   0.12089  13.476606       0.0
-7    PT3  ~   PT  1.000000         -          -         -
-8    PT8  ~   PT  1.986766  0.250421   7.933709       0.0
-9   PT11  ~   PT  2.683988  0.328562   8.168904       0.0
-10  PT15  ~   PT  0.822804  0.169667   4.849514  0.000001
-11  PT21  ~   PT  2.254133  0.279954   8.051805       0.0
-12  PT25  ~   PT  2.316856  0.293699   7.888543       0.0
-13  PT28  ~   PT  2.380786  0.299723   7.943302       0.0
-14   EC2  ~   EC  1.000000         -          -         -
-15   EC4  ~   EC  0.233110  0.056545   4.122569  0.000037
-16   EC9  ~   EC  0.847688  0.063872  13.271621       0.0
-17  EC14  ~   EC  0.323601  0.056495   5.727953       0.0
-18  EC18  ~   EC  0.256307  0.050356   5.089849       0.0
-19  EC20  ~   EC  1.272293  0.081116  15.684946       0.0
-20  EC22  ~   EC  1.443579  0.088366  16.336373       0.0
-21   PD6  ~   PD  1.000000         -          -         -
-22  PD10  ~   PD  0.835425  0.050086  16.679825       0.0
-23  PD13  ~   PD  0.447334  0.048915   9.145105       0.0
-24  PD17  ~   PD  1.153548   0.05693  20.262584       0.0
-25  PD19  ~   PD  0.273195  0.042607   6.411987       0.0
-26  PD24  ~   PD  0.964069  0.048251  19.980494       0.0
-27  PD27  ~   PD  0.674298  0.040274  16.742714       0.0
-
 ## 3. Empathy Profiles - Clustering (Step 4C)
 cluster,FS_mean,PT_mean,EC_mean,PD_mean
 1,3.6577946768060836,3.8522542096686583,4.076588810429114,3.2504073872895165
@@ -83,8 +31,8 @@ cluster,FS_mean,PT_mean,EC_mean,PD_mean
 
 
 ## 4. fsQCA Calibration (Step 4B)
-=== fsQCA Analysis Report: IRI Empathy (with Demographics) ===
-Date: 2026-02-11 09:25:10.437579 
+=== fsQCA Analysis Report: _with_md ===
+Date: 2026-02-11 14:43:27.47821 
 N Analysis Cases: 1067 
 
 --- Necessity Analysis ---

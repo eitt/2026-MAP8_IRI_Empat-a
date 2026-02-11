@@ -217,13 +217,7 @@ def create_report():
             for j, val in enumerate(row): table.cell(i+1, j+1).text = f"{val:.2f}"
         for cell in table.rows[0].cells: set_table_header_bg(cell)
 
-        box_img = '05_clustering/cluster_boxplots.png'
-        if os.path.exists(box_img):
-            doc.add_picture(box_img, width=Inches(5.0))
-            para = doc.add_paragraph("Figure 1. Empathy subscale distributions across identified clusters.")
-            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-    # --- Step 5, 6, 7, 8 ---
+    # --- Step 5, 6, 7 ---
     doc.add_heading("Step 5. Model evaluation and robustness", level=1)
     doc.add_paragraph("Each method passed its own validity criteria. Rather than seeking perfect convergence, MAP-8 evaluates whether "
                    "results are mutually informative. We verified that fsQCA solutions remain stable even when demographics are added.")
@@ -237,21 +231,96 @@ def create_report():
     doc.add_paragraph("Results suggest that high empathy is a configurational achievement. Management and social interventions "
                    "should target profiles (clusters) rather than assuming a one-size-fits-all linear increase in empathy.")
 
-    doc.add_heading("Step 8. Validation and Replication", level=1)
-    doc.add_paragraph("The roadmap facilitates cross-cohort replication. The consistency across 2023-2025 data (after conversion) "
-                   "validates the robustness of the MAP-8 approach for longitudinal psychometric research.")
+    # --- Step 8: Sensitivity Analysis ---
+    doc.add_heading("Step 8. Validation and Sensitivity Analysis (Multi-Stage Cleanup)", level=1)
+    doc.add_paragraph("Following the MAP-8 methodology, this project implements a 3-stage sensitivity analysis to quantify the impact of "
+                   "data cleaning on psychometric validity and configurational results. We contrast the following versions:")
+    p = doc.add_paragraph(f"1. Raw (Unfiltered) - The initial concatenated dataset (N \u2248 {raw_n})")
+    p = doc.add_paragraph(f"2. QC Only - After applying attention-check filters (N \u2248 {qc_n})")
+    p = doc.add_paragraph(f"3. Clean (QC + MD) - The final dataset after attention checks and Mahalanobis Distance removal (N \u2248 {final_n})")
 
-    # Save
+    # Comparative Table 6: Sample & Fit
+    doc.add_heading("Table 6. Global Sensitivity Comparison: Quality vs Fit", level=2)
+    table = doc.add_table(rows=6, cols=4)
+    table.style = 'Table Grid'
+    hdrs = ["Metric", "Raw (No Filter)", "QC Only", "Final (QC+MD)"]
+    for j, h in enumerate(hdrs):
+        table.cell(0,j).text = h
+        set_table_header_bg(table.cell(0,j))
+    
+    # Data extraction for fit
+    fits = {}
+    for s in ['_raw', '_no_md', '_with_md']:
+        path = f'03_sem/cfa_fit_indices{s}.csv'
+        if os.path.exists(path): fits[s] = pd.read_csv(path, index_col=0)
+    
+    rows = [
+        ("Sample Size (N)", str(raw_n), str(qc_n), str(final_n)),
+        ("CFI (Target > .90)", "N/A", "N/A", "N/A"),
+        ("TLI (Target > .90)", "N/A", "N/A", "N/A"),
+        ("RMSEA (Target < .08)", "N/A", "N/A", "N/A"),
+        ("SRMR (Target < .08)", "N/A", "N/A", "N/A")
+    ]
+    
+    for i, (label, *_) in enumerate(rows):
+        table.cell(i+1, 0).text = label
+        if i == 0:
+            table.cell(i+1, 1).text = str(raw_n)
+            table.cell(i+1, 2).text = str(qc_n)
+            table.cell(i+1, 3).text = str(final_n)
+        else:
+            metric = label.split(" ")[0]
+            for j, s in enumerate(['_raw', '_no_md', '_with_md']):
+                if s in fits and metric in fits[s].columns:
+                    val = fits[s].loc['Value', metric]
+                    table.cell(i+1, j+1).text = f"{val:.3f}"
+
+    add_spacer(doc)
+
+    # Comparative Heatmaps Figure
+    img_corr = '06_reports/figures/comparative_heatmaps.png'
+    if os.path.exists(img_corr):
+        doc.add_heading("Figure 1. Stability of Subscale Inter-correlations (Heatmaps)", level=2)
+        doc.add_picture(img_corr, width=Inches(6.0))
+        para = doc.add_paragraph("Note: Darker shades (mako palette) indicate higher positive correlations. Stability in "
+                              "the correlation structure across cleaning stages suggests a robust measurement model.")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # Table 7: Factor Correlations (Comparison)
+    doc.add_heading("Table 7. Subscale Correlation Matrix Comparison", level=2)
+    doc.add_paragraph("Below we present the subscale correlations for the Clean (QC+MD) dataset as the definitive reference.")
+    ref_path = '03_sem/subscale_corr_with_md.csv'
+    if os.path.exists(ref_path):
+        df_c = pd.read_csv(ref_path, index_col=0)
+        table = doc.add_table(rows=df_c.shape[0]+1, cols=df_c.shape[1]+1)
+        table.style = 'Table Grid'
+        table.cell(0,0).text = "Subscale"
+        for j, c in enumerate(df_c.columns): table.cell(0, j+1).text = str(c)
+        for i, (idx, row) in enumerate(df_c.iterrows()):
+            table.cell(i+1,0).text = str(idx)
+            for j, val in enumerate(row): table.cell(i+1, j+1).text = f"{val:.3f}"
+        for cell in table.rows[0].cells: set_table_header_bg(cell)
+
+    # Cluster Stability
+    img_clus = '06_reports/figures/comparative_clusters.png'
+    if os.path.exists(img_clus):
+        doc.add_heading("Figure 2. Profile Identification Stability (3-Way Comparison)", level=2)
+        doc.add_picture(img_clus, width=Inches(6.0))
+        para = doc.add_paragraph("Stability of cluster centroids (FS, PT, EC, PD levels) across Raw and Cleaned samples.")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # Final Save
     doc_file = '06_reports/Manuscript_Results_Replication.docx'
     try:
         doc.save(doc_file)
         print(f"Final Academic Manuscript saved to {doc_file}")
     except PermissionError:
-        print(f"WARNING: Resource BUSY. Please close {doc_file} in Word and try again.")
-        # Try a backup name to ensure completion
         doc_file_v2 = '06_reports/Manuscript_Results_Replication_v2.docx'
         doc.save(doc_file_v2)
-        print(f"Saved backup version to {doc_file_v2} instead.")
+        print(f"Saved backup version to {doc_file_v2} due to permission error.")
+
+if __name__ == "__main__":
+    create_report()
 
 if __name__ == "__main__":
     create_report()

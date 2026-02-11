@@ -117,28 +117,31 @@ df_clean['is_outlier'] = df_clean['md_score'] > threshold
 df_final = df_clean[df_clean['is_outlier'] == False].drop(columns=['md_score', 'is_outlier'])
 
 # 6. Save
-df_all.to_csv('01_harmonized/df_iri_all_harmonized.csv', index=False)
+df_all.to_csv('01_harmonized/df_iri_clean_raw.csv', index=False)
+df_clean.to_csv('01_harmonized/df_iri_clean_no_md.csv', index=False)
+df_final.to_csv('01_harmonized/df_iri_clean_with_md.csv', index=False)
+# Link the 'official' clean file to the one WITH MD for backward compatibility
 df_final.to_csv('01_harmonized/df_iri_clean.csv', index=False)
-# Save Descriptive Stats for Word Report
+
+# Save Descriptive Stats for Word Report (Three Versions)
 subscales = ['FS_mean', 'PT_mean', 'EC_mean', 'PD_mean', 'IRI_total']
+df_all[subscales].describe().to_csv('02_eda/descriptive_stats_raw.csv')
+df_clean[subscales].describe().to_csv('02_eda/descriptive_stats_no_md.csv')
+df_final[subscales].describe().to_csv('02_eda/descriptive_stats_with_md.csv')
+# Keep default for backward compatibility
 df_final[subscales].describe().to_csv('02_eda/descriptive_stats.csv')
 
 # 7. EDA Summary Report
-subscales = ['FS_mean', 'PT_mean', 'EC_mean', 'PD_mean', 'IRI_total']
-desc_stats = df_final[subscales].describe().to_string()
-counts_by_year = df_all['year'].value_counts().to_string()
-clean_counts_by_year = df_final['year'].value_counts().to_string()
+count_raw = len(df_all)
+count_qc = len(df_clean)
+count_md = len(df_final)
 
 with open('02_eda/eda_cleaning_report.txt', 'w') as f:
     f.write("=== MAP-8 EDA & Cleaning Report ===\n")
-    f.write(f"Note: 2025 dataset excluded per user request.\n\n")
-    f.write(f"Raw cases total: {len(df_all)}\n")
-    f.write(f"Raw cases by year:\n{counts_by_year}\n\n")
-    f.write(f"Cases after Quality Control (AC2/AC3 filtering): {len(df_clean)}\n")
-    f.write(f"Cases after Outlier Removal (Mahalanobis Distance): {len(df_final)}\n")
-    f.write(f"Dropped as potentially random: {len(df_clean) - len(df_final)}\n\n")
-    f.write(f"Final Cleaned Sample by year:\n{clean_counts_by_year}\n\n")
-    f.write("=== Descriptive Statistics (Cleaned Sample) ===\n")
-    f.write(desc_stats)
+    f.write(f"Raw cases total: {count_raw}\n")
+    f.write(f"Cases after Quality Control (AC2/AC3 filtering): {count_qc}\n")
+    f.write(f"Final cases after Outlier Removal (Mahalanobis Distance): {count_md}\n")
+    f.write(f"Dropped as inattentive: {count_raw - count_qc}\n")
+    f.write(f"Dropped as potentially random: {count_qc - count_md}\n")
 
 print(f"Data Prep Complete (2023-2024 only). Clean N = {len(df_final)}")

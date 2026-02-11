@@ -56,10 +56,13 @@ def main():
     else:
         print(f"[SKIP] R not found at {r_path}. Skipping configurational analysis.")
 
-    # 6. Technical Summary
+    # 6. Technical Visualizations (Comparative Plots)
+    run_command("python scripts/generate_visual_plots.py", "Generating 3-Way Comparative Visualizations")
+
+    # 7. Technical Summary
     run_command("python scripts/generate_final_report.py", "Consolidating Technical Pipeline MD")
 
-    # 7. Final Academic Manuscript (Word)
+    # 8. Final Academic Manuscript (Word)
     # We use a loop here to wait if Word is open
     for attempt in range(3):
         print(f"[*] Generating Word Manuscript (Attempt {attempt+1}/3)...")
