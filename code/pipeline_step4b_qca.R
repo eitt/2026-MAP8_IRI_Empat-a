@@ -35,18 +35,13 @@ df_raw$ec_f <- calibrate_iri(df_raw$EC_mean)
 df_raw$pd_f <- calibrate_iri(df_raw$PD_mean)
 df_raw$iri_total_f <- calibrate_iri(df_raw$IRI_total)
 
-# Demographics: Gender (assuming 1=Male, 2=Female or similar)
-# We treat gender as a crisp set or quasi-fuzzy (0 or 1)
-# Checking unique values to be safe. Let's assume binary-like for QCA or calibrate based on data.
-if ("gender" %in% names(df_raw)) {
-  # Recode gender to 0/1 if numeric, ensuring it's a condition
-  # Let's use 1 as 'presence' of the trait (e.g., female if 2 was female)
-  df_raw$gen_f <- ifelse(df_raw$gender == 2, 1, 0)
-}
+# Demographics: Gender (1=Male, 2=Female) and SES (0-6)
+# We treat these as crisp sets (0 or 1)
+df_raw$gen_f <- ifelse(df_raw$gender == 2, 1, 0) # 1 = Female
+df_raw$ses_f <- ifelse(df_raw$ses >= 3, 1, 0)   # 1 = High SES (Level 3+)
 
-# 2. Analysis Subset (including gender if exists)
-conds <- c("fs_f", "pt_f", "ec_f", "pd_f")
-if ("gen_f" %in% names(df_raw)) conds <- c(conds, "gen_f")
+# 2. Analysis Subset (including demographics)
+conds <- c("fs_f", "pt_f", "ec_f", "pd_f", "gen_f", "ses_f")
 
 df_qca <- df_raw[, c(conds, "iri_total_f")]
 df_qca <- df_qca[complete.cases(df_qca), ]

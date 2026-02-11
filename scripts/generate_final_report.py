@@ -1,10 +1,10 @@
 import os
 
 # Define paths
-eda_path = '02_eda/eda_summary.txt'
-sem_path = '03_sem/reliability_report.txt'
-qca_path = '04_qca/calibration_report.txt'
-cluster_path = '05_clustering/clustering_report.txt'
+eda_path = '02_eda/eda_cleaning_report.txt'
+sem_path = '03_sem/advanced_sem_detailed_report.txt'
+qca_path = '04_qca/qca_report_r.txt'
+cluster_path = '05_clustering/cluster_profiles.csv'
 output_report = '06_reports/MAP8_Implementation_Summary.md'
 
 def read_file_safe(path):

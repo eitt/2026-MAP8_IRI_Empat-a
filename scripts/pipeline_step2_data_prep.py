@@ -60,6 +60,23 @@ def get_h(df, year):
 
 df_all = pd.concat([get_h(df23, 2023), get_h(df24, 2024)], ignore_index=True)
 
+# 3.1 Harmonize Sociodemographics
+def harmonize_gender(val):
+    v = str(val).lower().strip()
+    if v in ['hombre', '1', '1.0', 'masculino']: return 1
+    if v in ['mujer', '2', '2.0', 'femenino']: return 2
+    return np.nan
+
+df_all['gender'] = df_all['gender'].apply(harmonize_gender)
+
+def harmonize_ses(val):
+    try:
+        return float(val)
+    except:
+        return np.nan
+
+df_all['ses'] = df_all['ses'].apply(harmonize_ses)
+
 # 4. Computed Scores
 df_all['FS_mean'] = df_all[[f"FS{i}" for i in fs_idx]].mean(axis=1)
 df_all['PT_mean'] = df_all[[f"PT{i}" for i in pt_idx]].mean(axis=1)

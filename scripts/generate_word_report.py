@@ -184,8 +184,9 @@ def create_report():
             row_cells[3].text = p_text
 
     doc.add_paragraph("4.2 fsQCA Estimation", style='Heading 2')
-    doc.add_paragraph("Sociodemographic analysis was integrated by including Gender as a condition. The sufficiency analysis "
-                   "seeks the minimal combination of conditions (empathy + gender) leading to high empathy.")
+    doc.add_paragraph("Sociodemographic analysis was integrated by including Gender and SES (Socioeconomic Status) as conditions. "
+                   "Gender was dummy-coded (1=Female, 0=Male) and SES was dichotomized (1=High SES [Level 3+], 0=Low SES). "
+                   "The sufficiency analysis seeks the minimal combination of empathy dimensions and sociodemographic conditions leading to high empathy.")
     
     qca_report_path = '04_qca/qca_report_r.txt'
     if os.path.exists(qca_report_path):
