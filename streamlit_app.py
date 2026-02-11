@@ -161,12 +161,28 @@ if df_raw is not None:
                     
                     c1, c2 = st.columns([1, 2])
                     with c1:
-                        st.write("**Model Fit Indices**")
-                        st.dataframe(stats.T)
+                        st.write("**Core Fit Indices**")
+                        # Display key metrics at a glance
+                        s = stats.iloc[0]
+                        f1, f2 = st.columns(2)
+                        f1.metric("CFI", f"{s.get('CFI', 0):.3f}")
+                        f2.metric("TLI", f"{s.get('TLI', 0):.3f}")
+                        f3, f4 = st.columns(2)
+                        f3.metric("RMSEA", f"{s.get('RMSEA', 0):.3f}")
+                        f4.metric("SRMR", f"{s.get('SRMR', 0):.3f}" if 'SRMR' in s else "N/A")
+                        
+                        st.divider()
+                        st.write("**All Parameters**")
+                        st.dataframe(stats.T, height=400)
                     with c2:
-                        st.write("**Factor Loadings**")
-                        loadings = est[est['op'] == '~'].rename(columns={'lval': 'Item', 'rval': 'Latent', 'Estimate': 'Loading'})
-                        st.dataframe(loadings[['Latent', 'Item', 'Loading', 'p-value']])
+                        st.write("**Standardized Factor Loadings**")
+                        # Get standardized loadings if possible
+                        try:
+                            std_est = model.inspect(std_est=True)
+                        except:
+                            std_est = est
+                        loadings = std_est[std_est['op'] == '~'].rename(columns={'lval': 'Item', 'rval': 'Latent', 'Estimate': 'Loading'})
+                        st.dataframe(loadings[['Latent', 'Item', 'Loading', 'p-value']], height=600)
                 except Exception as e:
                     st.error(f"SEM Error: {e}")
 
