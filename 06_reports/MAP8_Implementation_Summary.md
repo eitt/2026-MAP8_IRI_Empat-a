@@ -32,7 +32,7 @@ cluster,FS_mean,PT_mean,EC_mean,PD_mean
 
 ## 4. fsQCA Calibration (Step 4B)
 === fsQCA Analysis Report: _with_md ===
-Date: 2026-02-11 15:34:07.30378 
+Date: 2026-02-11 16:02:27.470166 
 N Analysis Cases: 1067 
 
 --- Necessity Analysis ---
