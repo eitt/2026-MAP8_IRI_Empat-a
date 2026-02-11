@@ -27,18 +27,25 @@ def run_clustering(input_file, suffix):
     profiles = df.groupby('cluster')[features].mean()
     profiles.to_csv(f'05_clustering/cluster_profiles{suffix}.csv')
     
-    # 3. Visualization
-    plt.figure(figsize=(10, 6))
-    sns.heatmap(profiles, annot=True, cmap='mako', fmt='.2f')
-    plt.title(f'Empathy Cluster Profiles{suffix.replace("_", " ").title()}')
-    plt.savefig(f'05_clustering/cluster_profiles{suffix}.png', dpi=300, bbox_inches='tight')
+    # 3. Visualization - Letter-width (8.5in), High DPI (300)
+    # 3a. Heatmap Profile
+    plt.figure(figsize=(8.5, 5))
+    sns.heatmap(profiles, annot=True, cmap='mako', fmt='.2f', annot_kws={"size": 12})
+    plt.title(f'Empathy Cluster Profiles - {suffix.replace("_", " ").title()}', fontsize=14)
+    plt.xlabel('Dimensions', fontsize=12)
+    plt.ylabel('Cluster', fontsize=12)
+    plt.savefig(f'05_clustering/cluster_profiles{suffix}.jpg', dpi=300, bbox_inches='tight')
     plt.close()
     
-    plt.figure(figsize=(12, 8))
+    # 3b. Boxplots Distribution
+    plt.figure(figsize=(8.5, 6))
     df_melt = df.melt(id_vars=['cluster'], value_vars=features)
     sns.boxplot(x='variable', y='value', hue='cluster', data=df_melt, palette='mako')
-    plt.title(f'Empathy Subscale Distributions by Cluster{suffix.replace("_", " ").title()}')
-    plt.savefig(f'05_clustering/cluster_boxplots{suffix}.png', dpi=300, bbox_inches='tight')
+    plt.title(f'Empathy Subscale Distributions - {suffix.replace("_", " ").title()}', fontsize=14)
+    plt.xlabel('Subscales', fontsize=12)
+    plt.ylabel('Score (1-5)', fontsize=12)
+    plt.legend(title='Cluster', loc='upper right')
+    plt.savefig(f'05_clustering/cluster_boxplots{suffix}.jpg', dpi=300, bbox_inches='tight')
     plt.close()
 
     # Compatibility

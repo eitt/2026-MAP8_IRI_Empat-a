@@ -1,5 +1,5 @@
 === fsQCA Analysis Report: _raw ===
-Date: 2026-02-11 14:43:18.454525 
+Date: 2026-02-11 15:33:56.204098 
 N Analysis Cases: 2050 
 
 --- Necessity Analysis ---
