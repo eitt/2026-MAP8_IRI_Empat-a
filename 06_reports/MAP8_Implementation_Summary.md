@@ -84,7 +84,7 @@ cluster,FS_mean,PT_mean,EC_mean,PD_mean
 
 ## 4. fsQCA Calibration (Step 4B)
 === fsQCA Analysis Report: IRI Empathy (with Demographics) ===
-Date: 2026-02-11 09:23:45.910546 
+Date: 2026-02-11 09:25:10.437579 
 N Analysis Cases: 1067 
 
 --- Necessity Analysis ---

@@ -1,5 +1,5 @@
 === fsQCA Analysis Report: IRI Empathy (with Demographics) ===
-Date: 2026-02-11 09:23:45.910546 
+Date: 2026-02-11 09:25:10.437579 
 N Analysis Cases: 1067 
 
 --- Necessity Analysis ---
