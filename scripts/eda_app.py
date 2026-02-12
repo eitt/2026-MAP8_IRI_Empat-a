@@ -225,6 +225,26 @@ if df_raw is not None:
         fig.update_layout(height=700)
         st.plotly_chart(fig, use_container_width=True)
 
+        st.divider()
+        st.subheader(f"📈 Descriptive Statistics ({corr_type})")
+        
+        if corr_type == "Items":
+            stats_df = df_active[active_items].describe().T
+            # Add Skew and Kurtosis
+            stats_df['skew'] = df_active[active_items].skew()
+            stats_df['kurtosis'] = df_active[active_items].kurtosis()
+        else:
+            sub_cols = [c for c in df_active.columns if c.endswith('_dyn')]
+            stats_df = df_active[sub_cols].describe().T
+            stats_df['skew'] = df_active[sub_cols].skew()
+            stats_df['kurtosis'] = df_active[sub_cols].kurtosis()
+            # Clean up index labels for subscales
+            stats_df.index = [i.replace('_dyn', '') for i in stats_df.index]
+
+        # Formatting for display
+        st.dataframe(stats_df.style.format("{:.3f}"), use_container_width=True)
+        st.caption(f"Summary metrics for the currently selected data subset (N={len(df_active)})")
+
     with tab2:
         st.subheader("Confirmatory Factor Analysis (CFA)")
         st.info("Dynamic CFA using semopy. This may take a few seconds after changing items.")
@@ -285,7 +305,7 @@ if df_raw is not None:
         
         # Item-Total Correlation
         target_sub = st.selectbox("Detailed Sensitivity for:", ["Fantasy", "Perspective Taking", "Empathic Concern", "Personal Distress"])
-        sub_map = {"Fantasy": fs_items, "Perspective Taking": pt_items, "Empathic Concern": ec_items, "Personal Distress": pd_items}
+        sub_map = {"Fantasy": fs_items, "Perspective Taking", "Empathic Concern", "Personal Distress"}
         sel_items = [i for i in sub_map[target_sub] if i in active_items]
         
         if sel_items:
