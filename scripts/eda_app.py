@@ -323,7 +323,7 @@ if df_raw is not None:
             
             # 2. Merged Selection
             if len(selected_years) > 1:
-                res_merged = run_quick_cfa(df_active, "Merged Selection")
+                res_merged = run_quick_cfa(df_active, "Merged")
                 if res_merged: results.append(res_merged)
             
             if results:
@@ -356,6 +356,65 @@ if df_raw is not None:
                     st.plotly_chart(fig_comp, use_container_width=True)
                 
                 st.info("💡 **Interpretation:** CFI/TLI > 0.90 are acceptable; > 0.95 good. RMSEA/SRMR < 0.08 acceptable; < 0.05 good.")
+
+                # --- NEW: Loadings Comparison ---
+                st.divider()
+                st.subheader("📈 Cross-Dataset Factor Loadings Comparison")
+                st.markdown("Compare how strongly each item loads onto its latent construct across datasets.")
+                
+                loading_results = []
+                
+                def get_loadings(data, label):
+                    if len(data) < 50: return None
+                    try:
+                        m = Model(mod_desc)
+                        m.fit(data)
+                        est = m.inspect(std_est=True)
+                        loadings = est[est['op'] == '~'].copy()
+                        loadings = loadings.rename(columns={'lval': 'Item', 'rval': 'Latent', 'Estimate': f'Loading_{label}'})
+                        return loadings[['Latent', 'Item', f'Loading_{label}']]
+                    except: return None
+
+                # Collect loadings for each subset
+                all_loadings = []
+                
+                # 1. Individual Years
+                for yr in available_years:
+                    df_yr = process_data(df_raw, qc_level, md_p_threshold, do_reversal, exclude_items, [yr])
+                    res = get_loadings(df_yr, f"Year {yr}")
+                    if res is not None: all_loadings.append(res)
+                
+                # 2. Merged Selection
+                if len(selected_years) > 1:
+                    res_merged = get_loadings(df_active, "Merged")
+                    if res_merged is not None: all_loadings.append(res_merged)
+                
+                if all_loadings:
+                    # Merge all loading dataframes on Latent and Item
+                    df_comp_load = all_loadings[0]
+                    for df_next in all_loadings[1:]:
+                        df_comp_load = pd.merge(df_comp_load, df_next, on=['Latent', 'Item'], how='outer')
+                    
+                    # Display Table
+                    st.write("#### Standardized Loadings (β)")
+                    loading_cols = [c for c in df_comp_load.columns if 'Loading_' in c]
+                    st.dataframe(df_comp_load.style.background_gradient(subset=loading_cols, cmap='Blues', vmin=0, vmax=1).format({c: '{:.3f}' for c in loading_cols}), use_container_width=True)
+                    
+                    # Visualization: Stability of Loadings
+                    df_melt = df_comp_load.melt(id_vars=['Latent', 'Item'], value_vars=loading_cols, var_name='Dataset', value_name='Loading')
+                    df_melt['Dataset'] = df_melt['Dataset'].str.replace('Loading_', '')
+                    
+                    fig_load = px.bar(df_melt, x='Item', y='Loading', color='Dataset', barmode='group', 
+                                     facet_col='Latent', facet_col_wrap=2,
+                                     title="Latent Structure Stability (Comparative Loadings)",
+                                     color_discrete_sequence=px.colors.qualitative.Prism)
+                    fig_load.update_yaxes(range=[0, 1])
+                    fig_load.update_layout(height=800)
+                    st.plotly_chart(fig_load, use_container_width=True)
+                    
+                    st.info("💡 **Insight:** High stability across years indicates 'Measurement Invariance'—the items mean the same thing to different cohorts.")
+                else:
+                    st.warning("Could not calculate loadings for subsets.")
             else:
                 st.error("Insufficient data or model failure in subsets. Ensure enough items are active.")
 
