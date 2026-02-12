@@ -83,6 +83,31 @@ if df_raw is not None:
     
     active_items = [i for i in all_all if i not in exclude_items]
 
+    # CFA Configuration
+    st.sidebar.subheader("CFA Configuration")
+    marker_vars = {}
+    with st.sidebar.expander("🛠️ Marker Variables (Fixed to 1.0)", expanded=False):
+        st.caption("Select which item's loading is fixed to 1.0 to set the scale of the latent variable.")
+        for name, items in [('FS', fs_items), ('PT', pt_items), ('EC', ec_items), ('PD', pd_items)]:
+            current = [i for i in items if i in active_items]
+            if current:
+                marker_vars[name] = st.selectbox(f"{name} Marker", options=current, index=0)
+            else:
+                marker_vars[name] = None
+
+    # --- CFA Model Setup ---
+    mod_parts = []
+    for name, items in [('FS', fs_items), ('PT', pt_items), ('EC', ec_items), ('PD', pd_items)]:
+        current = [i for i in items if i in active_items]
+        if current:
+            # Reorder current list to put marker variable first (semopy fixes the first item by default)
+            marker = marker_vars.get(name)
+            if marker and marker in current:
+                current.remove(marker)
+                current.insert(0, marker)
+            mod_parts.append(f"{name} =~ {' + '.join(current)}")
+    mod_desc = "\n".join(mod_parts)
+
     # --- Processing Engine ---
     def process_data(df, qc, p_val, reverse, drops, years=None):
         temp = df.copy()
@@ -249,14 +274,9 @@ if df_raw is not None:
         st.subheader("Confirmatory Factor Analysis (CFA)")
         st.info("Dynamic CFA using semopy. This may take a few seconds after changing items.")
         
-        # Build dynamic model string
-        mod_parts = []
-        for name, items in [('FS', fs_items), ('PT', pt_items), ('EC', ec_items), ('PD', pd_items)]:
-            current = [i for i in items if i in active_items]
-            if current: mod_parts.append(f"{name} =~ {' + '.join(current)}")
-        
-        mod_desc = "\n".join(mod_parts)
-        
+        with st.expander("View Model Specification"):
+            st.code(mod_desc)
+
         if st.button("Run CFA"):
             with st.spinner("Optimizing Latent Model..."):
                 try:
