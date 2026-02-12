@@ -36,10 +36,13 @@ st.markdown("Explore sensitivity, data cleaning thresholds, and latent structure
 # 1. Data Loading
 @st.cache_data
 def load_data():
-    path = '01_harmonized/df_iri_all_harmonized.csv'
+    path = '01_harmonized/df_iri_playground.csv'
     if not os.path.exists(path):
-        st.error(f"Data not found at {path}. Please run the pipeline first.")
-        return None
+        # Fallback to standard if playground doesn't exist for some reason
+        path = '01_harmonized/df_iri_all_harmonized.csv'
+        if not os.path.exists(path):
+            st.error(f"Data not found. Please run 'python scripts/prepare_playground_data.py' first.")
+            return None
     return pd.read_csv(path)
 
 df_raw = load_data()
@@ -325,20 +328,32 @@ if df_raw is not None:
             
             if results:
                 df_res = pd.DataFrame(results)
-                cols = ['Dataset', 'N', 'CFI', 'TLI', 'RMSEA', 'SRMR']
-                existing = [c for c in cols if c in df_res.columns]
+                cols_to_show = ['Dataset', 'N', 'CFI', 'TLI', 'RMSEA', 'SRMR']
+                existing_cols = [c for c in cols_to_show if c in df_res.columns]
                 
+                df_display = df_res[existing_cols].set_index('Dataset')
+                
+                # Safely prepare styling
+                format_dict = {c: '{:.3f}' for c in ['CFI', 'TLI', 'RMSEA', 'SRMR'] if c in df_display.columns}
+                high_max_cols = [c for c in ['CFI', 'TLI'] if c in df_display.columns]
+                high_min_cols = [c for c in ['RMSEA', 'SRMR'] if c in df_display.columns]
+
                 st.write("### Fit Indices Comparison")
-                st.dataframe(df_res[existing].set_index('Dataset').style.format({
-                    'CFI': '{:.3f}', 'TLI': '{:.3f}', 'RMSEA': '{:.3f}', 'SRMR': '{:.3f}'
-                }).highlight_max(subset=['CFI', 'TLI'], color='#dcfce7')
-                  .highlight_min(subset=['RMSEA', 'SRMR'], color='#dcfce7'), use_container_width=True)
+                styler = df_display.style.format(format_dict)
+                if high_max_cols:
+                    styler = styler.highlight_max(subset=high_max_cols, color='#dcfce7')
+                if high_min_cols:
+                    styler = styler.highlight_min(subset=high_min_cols, color='#dcfce7')
+                
+                st.dataframe(styler, use_container_width=True)
                 
                 # Plotly Visualization
-                fig_comp = px.bar(df_res, x='Dataset', y=['CFI', 'TLI'], barmode='group',
-                                 title="Comparative Fit (Higher is Better)",
-                                 color_discrete_sequence=['#1e3a8a', '#3b82f6'])
-                st.plotly_chart(fig_comp, use_container_width=True)
+                plot_cols = [c for c in ['CFI', 'TLI'] if c in df_res.columns]
+                if plot_cols:
+                    fig_comp = px.bar(df_res, x='Dataset', y=plot_cols, barmode='group',
+                                     title="Comparative Fit (Higher is Better)",
+                                     color_discrete_sequence=['#1e3a8a', '#3b82f6'])
+                    st.plotly_chart(fig_comp, use_container_width=True)
                 
                 st.info("💡 **Interpretation:** CFI/TLI > 0.90 are acceptable; > 0.95 good. RMSEA/SRMR < 0.08 acceptable; < 0.05 good.")
             else:
