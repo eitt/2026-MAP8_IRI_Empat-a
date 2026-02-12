@@ -58,6 +58,16 @@ if df_raw is not None:
     st.sidebar.subheader("Reversal Logic")
     do_reversal = st.sidebar.toggle("Apply Correct Reversal (FS7, PD13)", value=True)
     
+    # Dataset Selection
+    st.sidebar.subheader("Dataset Selection")
+    available_years = sorted(df_raw['year'].unique())
+    selected_years = st.sidebar.multiselect(
+        "Included Years", 
+        options=available_years, 
+        default=available_years,
+        help="Filter data by year (2023, 2024, 2025) or combinations."
+    )
+    
     # Feature Selection
     st.sidebar.subheader("Variable Management")
     fs_items = [f"FS{i}" for i in [1, 5, 7, 12, 16, 23, 26]]
@@ -71,9 +81,13 @@ if df_raw is not None:
     active_items = [i for i in all_all if i not in exclude_items]
 
     # --- Processing Engine ---
-    def process_data(df, qc, p_val, reverse, drops):
+    def process_data(df, qc, p_val, reverse, drops, years=None):
         temp = df.copy()
         
+        # 0. Filter by selected years
+        if years:
+            temp = temp[temp['year'].isin(years)]
+            
         # 1. Optional Reversal simulation
         if reverse:
             # Note: The 'all_harmonized' file already has some logic applied. 
@@ -106,7 +120,7 @@ if df_raw is not None:
             
         return temp_clean
 
-    df_active = process_data(df_raw, qc_level, md_p_threshold, do_reversal, exclude_items)
+    df_active = process_data(df_raw, qc_level, md_p_threshold, do_reversal, exclude_items, selected_years)
 
     # --- Dashboard Layout ---
     m1, m2, m3, m4 = st.columns(4)
@@ -127,7 +141,7 @@ if df_raw is not None:
         return (n/(n-1)) * (1-(v.sum()/tv))
 
     # Tabs
-    tab1, tab2, tab3 = st.tabs(["📊 Correlations & Descriptives", "📉 CFA & Fit", "🧩 Subscale Reliability"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Correlations & Descriptives", "📉 CFA & Fit", "🧩 Subscale Reliability", "🚀 Cross-Dataset Comparison"])
 
     with tab1:
         st.subheader("Interactive Correlation Matrix")
@@ -218,6 +232,57 @@ if df_raw is not None:
                 it_corr[item] = df_active[item].corr(total - df_active[item])
             st.bar_chart(pd.Series(it_corr), color="#1e3a8a")
             st.caption(f"Corrected Item-Total Correlations for {target_sub}")
+
+    with tab4:
+        st.subheader("🚀 Cross-Dataset Model Fit Comparison")
+        st.markdown("Compare psychometric indicators across individual years and the merged selection.")
+        
+        if st.button("Generate Comparison Table"):
+            results = []
+            
+            # Helper to run analysis
+            def run_quick_cfa(data, label):
+                if len(data) < 50: return None
+                try:
+                    m = Model(mod_desc)
+                    m.fit(data)
+                    s = calc_stats(m).iloc[0].to_dict()
+                    s['Dataset'] = label
+                    s['N'] = len(data)
+                    return s
+                except: return None
+
+            # 1. Individual Years
+            for yr in available_years:
+                df_yr = process_data(df_raw, qc_level, md_p_threshold, do_reversal, exclude_items, [yr])
+                res = run_quick_cfa(df_yr, f"Year {yr}")
+                if res: results.append(res)
+            
+            # 2. Merged Selection
+            if len(selected_years) > 1:
+                res_merged = run_quick_cfa(df_active, "Merged Selection")
+                if res_merged: results.append(res_merged)
+            
+            if results:
+                df_res = pd.DataFrame(results)
+                cols = ['Dataset', 'N', 'CFI', 'TLI', 'RMSEA', 'SRMR']
+                existing = [c for c in cols if c in df_res.columns]
+                
+                st.write("### Fit Indices Comparison")
+                st.dataframe(df_res[existing].set_index('Dataset').style.format({
+                    'CFI': '{:.3f}', 'TLI': '{:.3f}', 'RMSEA': '{:.3f}', 'SRMR': '{:.3f}'
+                }).highlight_max(subset=['CFI', 'TLI'], color='#dcfce7')
+                  .highlight_min(subset=['RMSEA', 'SRMR'], color='#dcfce7'), use_container_width=True)
+                
+                # Plotly Visualization
+                fig_comp = px.bar(df_res, x='Dataset', y=['CFI', 'TLI'], barmode='group',
+                                 title="Comparative Fit (Higher is Better)",
+                                 color_discrete_sequence=['#1e3a8a', '#3b82f6'])
+                st.plotly_chart(fig_comp, use_container_width=True)
+                
+                st.info("💡 **Interpretation:** CFI/TLI > 0.90 are acceptable; > 0.95 good. RMSEA/SRMR < 0.08 acceptable; < 0.05 good.")
+            else:
+                st.error("Insufficient data or model failure in subsets. Ensure enough items are active.")
 
 else:
     st.info("Awaiting pipeline completion to load harmonized data...")
