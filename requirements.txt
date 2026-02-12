@@ -10,3 +10,8 @@ openpyxl
 python-docx
 matplotlib
 seaborn
+altair
+protobuf
+watchdog
+tenacity
+packaging
