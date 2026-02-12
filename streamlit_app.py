@@ -141,7 +141,67 @@ if df_raw is not None:
         return (n/(n-1)) * (1-(v.sum()/tv))
 
     # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Correlations & Descriptives", "📉 CFA & Fit", "🧩 Subscale Reliability", "🚀 Cross-Dataset Comparison"])
+    tab0, tab1, tab2, tab3, tab4 = st.tabs([
+        "🏠 Welcome & Guide", 
+        "📊 Correlations & Descriptives", 
+        "📉 CFA & Fit", 
+        "🧩 Subscale Reliability", 
+        "🚀 Cross-Dataset Comparison"
+    ])
+
+    with tab0:
+        st.header("Welcome to the MAP-8 Psychometric Playground! 🧪")
+        st.markdown("""
+        This tool is designed to help researchers explore the **Interpersonal Reactivity Index (IRI)** dataset across three years of data collection. 
+        Adjust the filters in the sidebar to see how data cleaning decisions impact latent structures and fit.
+        """)
+        
+        col_doc1, col_doc2 = st.columns(2)
+        
+        with col_doc1:
+            st.subheader("🧹 Data Cleaning Logic")
+            
+            with st.expander("1. Attention Check Strictness", expanded=True):
+                st.write("""
+                **Why?** Respondents sometimes click through surveys without reading. We use 'Trap Questions' (e.g., *'Select Strongly Agree for this item'*) to detect noise.
+                - **Relaxed:** Includes everyone.
+                - **Standard (Default):** Allows 1 failure ($QC \le 1$).
+                - **Strict:** Only includes perfect responders ($QC = 0$).
+                """)
+            
+            with st.expander("2. Mahalanobis Distance (Outliers)", expanded=True):
+                st.write("""
+                **Why?** To detect multivariate outliers—patterns of responses that are mathematically 'too far' from the average.
+                """)
+                st.latex(r"D_M(x) = \sqrt{(x - \mu)^T \Sigma^{-1} (x - \mu)}")
+                st.write("""
+                **Example:** If someone answers '5' to all Empathic Concern items but '1' to all Personal Distress items in a way that is highly improbable, the distance increases. 
+                *Lower p-value threshold = stricter exclusion.*
+                """)
+
+        with col_doc2:
+            st.subheader("⚙️ Psychometric Controls")
+            
+            with st.expander("3. Reversal Logic", expanded=True):
+                st.write("""
+                **Why?** Items like **FS7** (*"I am usually objective when I watch a movie..."*) are reversed because a high score indicates *lower* fantasy engagement. 
+                Reversing ensures that all items in a subscale point in the **same psychological direction**, which is critical for valid Alpha ($\alpha$) and CFA results.
+                """)
+                
+            with st.expander("4. Variable Management", expanded=True):
+                st.write("""
+                **Why?** Some items might be 'noisy' or misunderstood by a specific population. By dropping them, you can observe if the **Model Fit (CFI/TLI)** increases. 
+                If dropping an item significantly improves fit, it might be a candidate for permanent removal in future research versions.
+                """)
+
+        st.divider()
+        st.subheader("🛠️ Map of the Playground")
+        st.markdown("""
+        - **📊 Correlations:** Visualize how items talk to each other. Look for 'blobs' of color within subscales.
+        - **📉 CFA & Fit:** The 'Gold Standard' for validation. Checks if the 4-factor structure actually holds up.
+        - **🧩 Reliability:** Check Cronbach's Alpha. If $\alpha < 0.70$, the subscale is considered 'weak'.
+        - **🚀 Comparison:** The most powerful tool. See if the model performs better in 2023 vs 2025.
+        """)
 
     with tab1:
         st.subheader("Interactive Correlation Matrix")
